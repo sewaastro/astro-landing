@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { ChevronDown } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -22,11 +23,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useRemediesCategories } from '@/hooks/use-remedies-category';
+import { useAstrologerTags } from '@/hooks/use-astrologer-tags';
 import { useDeleteRemedyMedia, useUploadRemedyMedia } from '@/hooks/use-remedy-products';
 import { MediaUploader, type UploaderMediaItem } from './media-uploader';
 import type { DeliveryType } from '@/lib/remedy-order-api';
 import type { RemedyProduct, RemedyProductInput } from '@/lib/remedy-product-api';
+
+// The mobile app's Create Remedy screen sources subcategory options from the
+// `type=expertise` astrologer tags, so the admin dropdown mirrors that here.
+const SUBCATEGORY_TAG_TYPE = 'expertise';
 
 const DELIVERY_TYPE_OPTIONS: { label: string; value: DeliveryType }[] = [
   { label: 'Physical', value: 'physical' },
@@ -39,7 +51,7 @@ const schema = z.object({
   name: z.string().min(3, 'Must be at least 3 characters').max(100),
   subtitle: z.string().max(200).optional(),
   category: z.string().min(1, 'Category is required'),
-  subcategoryText: z.string().optional(),
+  subcategory: z.array(z.string()).min(1, 'At least one subcategory is required'),
   description: z.string().min(1, 'Description is required'),
   prices: z.object({
     npr: z.coerce.number().min(0),
@@ -84,6 +96,7 @@ export function RemedyProductForm({
   onCancel,
 }: RemedyProductFormProps) {
   const { data: categories } = useRemediesCategories();
+  const { data: subcategoryTags } = useAstrologerTags(SUBCATEGORY_TAG_TYPE);
   const uploadMedia = useUploadRemedyMedia();
   const deleteMedia = useDeleteRemedyMedia();
 
@@ -93,7 +106,7 @@ export function RemedyProductForm({
       name: defaultValues?.name ?? '',
       subtitle: defaultValues?.subtitle ?? '',
       category: defaultValues?.category.categoryId ?? '',
-      subcategoryText: defaultValues?.subcategory.join(', ') ?? '',
+      subcategory: defaultValues?.subcategory ?? [],
       description: descriptionFromJson(defaultValues?.description),
       prices: {
         npr: defaultValues?.prices.npr ?? 0,
@@ -126,12 +139,7 @@ export function RemedyProductForm({
       name: values.name.trim(),
       subtitle: values.subtitle?.trim() || undefined,
       category: values.category,
-      subcategory: values.subcategoryText
-        ? values.subcategoryText
-            .split(',')
-            .map(s => s.trim())
-            .filter(Boolean)
-        : [],
+      subcategory: values.subcategory,
       description: descriptionToJson(values.description),
       prices: values.prices,
       discount: values.discount ?? 0,
@@ -204,19 +212,55 @@ export function RemedyProductForm({
 
         <FormField
           control={form.control}
-          name="subcategoryText"
+          name="subcategory"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-mukta text-neutral-700">
-                Subcategory tags (comma-separated)
-              </FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="e.g. Vedic Astrology, Numerology"
-                  className="font-mukta"
-                />
-              </FormControl>
+              <FormLabel className="font-mukta text-neutral-700">Subcategory</FormLabel>
+              <DropdownMenu>
+                <FormControl>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="font-mukta w-full justify-between font-normal"
+                    >
+                      <span className="truncate text-left">
+                        {field.value.length > 0 ? (
+                          field.value.join(', ')
+                        ) : (
+                          <span className="text-neutral-400">Select subcategories</span>
+                        )}
+                      </span>
+                      <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </FormControl>
+                <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
+                  {(subcategoryTags ?? []).length === 0 ? (
+                    <div className="font-mukta px-2 py-1.5 text-sm text-neutral-400">
+                      No subcategories available
+                    </div>
+                  ) : (
+                    subcategoryTags?.map(tag => (
+                      <DropdownMenuCheckboxItem
+                        key={tag._id}
+                        className="font-mukta"
+                        checked={field.value.includes(tag.name)}
+                        onSelect={event => event.preventDefault()}
+                        onCheckedChange={checked => {
+                          field.onChange(
+                            checked
+                              ? [...field.value, tag.name]
+                              : field.value.filter(v => v !== tag.name),
+                          );
+                        }}
+                      >
+                        {tag.name}
+                      </DropdownMenuCheckboxItem>
+                    ))
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <FormMessage />
             </FormItem>
           )}
