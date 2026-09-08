@@ -125,7 +125,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             action={async () => {
               'use server';
               const apiRoot = tryGetPublicBackendBaseUrl();
-              const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+              const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(
+                /\/$/,
+                '',
+              );
               // This redirect URI must be added exactly in Google Cloud Console.
               const redirectUri = `${siteUrl}/api/auth/callback/google`;
               redirect(

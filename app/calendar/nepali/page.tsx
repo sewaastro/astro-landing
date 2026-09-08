@@ -21,8 +21,6 @@ export const metadata: Metadata = {
   ],
 };
 
-
-
 export default function NepaliCalendarPage() {
   return (
     <main className="container mx-auto min-h-screen pt-6 sm:pt-8 lg:pt-10">

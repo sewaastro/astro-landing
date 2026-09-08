@@ -46,6 +46,8 @@ type CommissionRateCardProps = {
   description: string;
   settings: CommissionSettings | undefined;
   isLoading: boolean;
+  fieldLabel?: string;
+  notice?: string;
 };
 
 export function CommissionRateCard({
@@ -54,6 +56,8 @@ export function CommissionRateCard({
   description,
   settings,
   isLoading,
+  fieldLabel = 'Commission Percentage (%)',
+  notice,
 }: CommissionRateCardProps) {
   const updateMutation = useUpdateCommissionBySource(source);
 
@@ -86,14 +90,17 @@ export function CommissionRateCard({
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              {notice && (
+                <p className="rounded-md bg-amber-50 px-3 py-2 font-mukta text-xs text-amber-800">
+                  {notice}
+                </p>
+              )}
               <FormField
                 control={form.control}
                 name="commissionPercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mukta text-neutral-700">
-                      Commission Percentage (%)
-                    </FormLabel>
+                    <FormLabel className="font-mukta text-neutral-700">{fieldLabel}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}

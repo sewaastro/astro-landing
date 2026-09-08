@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { ghostClient } from '@/lib/ghostClient';
+import { env } from '@/lib/env';
 
 // Always fetch from Ghost on every request so new/updated/deleted posts
 // appear in the sitemap immediately without needing webhook configuration.
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.astrosewa.com';
+const BASE_URL = env.siteUrl;
 
 const STATIC_PAGES: MetadataRoute.Sitemap = [
   {

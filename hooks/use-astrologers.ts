@@ -2,7 +2,11 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { fetchAdminAstrologers, updateLiveStreamingEnabled } from '@/lib/astrologers-admin-api';
+import {
+  fetchAdminAstrologers,
+  updateLiveStreamingEnabled,
+  updateRemedyManagementEnabled,
+} from '@/lib/astrologers-admin-api';
 
 function useBackendToken(): string | null {
   const { data: session, status } = useSession();
@@ -32,6 +36,21 @@ export function useUpdateLiveStreamingEnabled() {
       astrologerUserId: string;
       isLiveStreamingEnabled: boolean;
     }) => updateLiveStreamingEnabled(token!, astrologerUserId, isLiveStreamingEnabled),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
+  });
+}
+
+export function useUpdateRemedyManagementEnabled() {
+  const token = useBackendToken();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      astrologerUserId,
+      isRemedyManagementEnabled,
+    }: {
+      astrologerUserId: string;
+      isRemedyManagementEnabled: boolean;
+    }) => updateRemedyManagementEnabled(token!, astrologerUserId, isRemedyManagementEnabled),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
   });
 }

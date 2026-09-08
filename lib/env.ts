@@ -12,6 +12,13 @@ const ghostContentApiKey =
 const ghostContentApiVersion =
   process.env.GHOST_CONTENT_API_VERSION ?? 'v5.0';
 
+// Strip trailing slashes so callers can safely do `${siteUrl}/path` without
+// risking a double slash if the env var was configured with one (e.g. "https://example.com/").
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.astrosewa.com').replace(
+  /\/$/,
+  ''
+);
+
 export const env = {
   ghostContentApiUrl: required(
     ghostContentApiUrl,
@@ -22,4 +29,5 @@ export const env = {
     'GHOST_CONTENT_API_KEY (or CONTENT_API_KEY)'
   ),
   ghostContentApiVersion,
+  siteUrl,
 } as const;

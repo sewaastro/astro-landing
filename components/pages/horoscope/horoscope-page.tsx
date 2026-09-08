@@ -2,7 +2,6 @@
 
 import { Suspense } from 'react';
 
-
 import { HoroscopeHeroSignsSection } from '@/components/pages/horoscope';
 import Services from '@/components/pages/landing/services';
 import TalkToOurAstrologer from '@/components/pages/landing/talk-to-our-astrologer';

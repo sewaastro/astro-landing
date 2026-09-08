@@ -20,6 +20,7 @@ export interface AdminAstrologer {
   isAstrologerActive?: boolean;
   isBookingEnabled?: boolean;
   isLiveStreamingEnabled: boolean;
+  isRemedyManagementEnabled: boolean;
   createdAt?: string;
 }
 
@@ -109,5 +110,18 @@ export async function updateLiveStreamingEnabled(
     token,
     'PATCH',
     { isLiveStreamingEnabled },
+  );
+}
+
+export async function updateRemedyManagementEnabled(
+  token: string,
+  astrologerUserId: string,
+  isRemedyManagementEnabled: boolean,
+): Promise<void> {
+  await backendRequest<unknown>(
+    `astrologer-details/admin/${astrologerUserId}/remedy-management-status`,
+    token,
+    'PATCH',
+    { isRemedyManagementEnabled },
   );
 }

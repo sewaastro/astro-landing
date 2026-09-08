@@ -179,9 +179,7 @@ export default function CompatibilityMatchPage() {
 
   const lastHandledQueryRef = useRef<string | null>(null);
 
-  const [horoscopeCardLang] = useState<ELanguage>(() =>
-    readCardDisplayLanguage(),
-  );
+  const [horoscopeCardLang] = useState<ELanguage>(() => readCardDisplayLanguage());
   const [exploreContentLanguage, setExploreContentLanguage] = useState<ELanguage>(uiLanguage);
   const [exploreHeaderLanguage, setExploreHeaderLanguage] = useState<ELanguage>(uiLanguage);
   const [horoscopeRows, setHoroscopeRows] = useState<HoroscopeSummaryRow[] | null>(null);

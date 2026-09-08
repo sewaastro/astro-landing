@@ -7,6 +7,7 @@ import './globals.css';
 import clsx from 'clsx';
 
 import { SiteChrome } from '@/components/layout/site-chrome';
+import { env } from '@/lib/env';
 
 const tiroDevanagari = Tiro_Devanagari_Sanskrit({
   variable: '--font-tiro-devanagari',
@@ -38,7 +39,7 @@ const lato = Lato({
   weight: ['400', '700'],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.astrosewa.com';
+const SITE_URL = env.siteUrl;
 
 export const metadata: Metadata = {
   title: {

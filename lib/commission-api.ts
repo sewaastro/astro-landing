@@ -6,10 +6,11 @@ export interface CommissionSettings {
   updatedAt: string | null;
 }
 
-export type CommissionSource = 'remedy' | 'gift';
+export type CommissionSource = 'remedy' | 'remedy_self_sale' | 'gift';
 
 export interface AllCommissionSettings {
   remedy: CommissionSettings;
+  remedySelfSale: CommissionSettings;
   gift: CommissionSettings;
 }
 

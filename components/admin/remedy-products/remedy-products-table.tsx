@@ -1,7 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import {
+  Pencil,
+  Trash2,
+  ChevronsLeft,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRight,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -21,21 +28,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
-import { ChangeTierDialog } from './change-tier-dialog';
-import { useTiers } from '@/hooks/use-tiers';
-import {
-  useUpdateLiveStreamingEnabled,
-  useUpdateRemedyManagementEnabled,
-} from '@/hooks/use-astrologers';
-import type { AdminAstrologer } from '@/lib/astrologers-admin-api';
+import { useToggleRemedyProductActive } from '@/hooks/use-remedy-products';
+import type { RemedyProduct } from '@/lib/remedy-product-api';
 
 const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SKELETON_ROW_IDS = ['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5'];
-const COLUMN_COUNT = 7;
+const COLUMN_COUNT = 8;
 
-interface AstrologersTableProps {
-  data: AdminAstrologer[];
+interface RemedyProductsTableProps {
+  data: RemedyProduct[];
   isLoading: boolean;
   isFetching: boolean;
   page: number;
@@ -43,112 +44,23 @@ interface AstrologersTableProps {
   total: number;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
+  onEdit: (row: RemedyProduct) => void;
+  onDelete: (row: RemedyProduct) => void;
 }
 
-function TierCell({ astrologer }: { astrologer: AdminAstrologer }) {
-  const [open, setOpen] = useState(false);
-  const { data: tiers } = useTiers();
-  const tier = tiers?.find(t => t._id === astrologer.tierId);
-  const userId = astrologer.user?._id ?? undefined;
-
-  return (
-    <div className="flex items-center gap-2">
-      {tier ? (
-        <Badge className="bg-amber-50 font-mukta text-xs text-amber-800">{tier.name}</Badge>
-      ) : (
-        <Badge className="bg-neutral-100 font-mukta text-xs text-neutral-500">No tier</Badge>
-      )}
-      {userId && (
-        <>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => setOpen(true)}
-            className="h-7 font-mukta text-xs"
-          >
-            Change Tier
-          </Button>
-          <ChangeTierDialog
-            open={open}
-            onOpenChange={setOpen}
-            astrologerUserId={userId}
-            astrologerName={astrologer.user?.fullName ?? astrologer.user?.email ?? 'astrologer'}
-            currentTierId={astrologer.tierId ?? undefined}
-          />
-        </>
-      )}
-    </div>
-  );
-}
-
-function LiveStreamingCell({ astrologer }: { astrologer: AdminAstrologer }) {
-  const { data: session } = useSession();
-  const isSuperAdmin = session?.user?.roles?.includes('SUPER_ADMIN') ?? false;
-  const userId = astrologer.user?._id ?? undefined;
-  const mutation = useUpdateLiveStreamingEnabled();
-
-  if (!isSuperAdmin) {
-    return (
-      <Badge
-        className={`font-mukta text-xs ${
-          astrologer.isLiveStreamingEnabled
-            ? 'bg-green-50 text-green-700'
-            : 'bg-neutral-100 text-neutral-500'
-        }`}
-      >
-        {astrologer.isLiveStreamingEnabled ? 'Enabled' : 'Disabled'}
-      </Badge>
-    );
-  }
-
+function IsActiveCell({ remedy }: { remedy: RemedyProduct }) {
+  const mutation = useToggleRemedyProductActive();
   return (
     <Switch
-      checked={astrologer.isLiveStreamingEnabled ?? false}
-      disabled={!userId || mutation.isPending}
-      onCheckedChange={checked => {
-        if (!userId) return;
-        mutation.mutate({ astrologerUserId: userId, isLiveStreamingEnabled: checked });
-      }}
-      aria-label="Toggle live streaming access"
+      checked={remedy.isActive}
+      disabled={mutation.isPending}
+      onCheckedChange={checked => mutation.mutate({ id: remedy.id, isActive: checked })}
+      aria-label="Toggle visibility"
     />
   );
 }
 
-function RemedyManagementCell({ astrologer }: { astrologer: AdminAstrologer }) {
-  const { data: session } = useSession();
-  const isSuperAdmin = session?.user?.roles?.includes('SUPER_ADMIN') ?? false;
-  const userId = astrologer.user?._id ?? undefined;
-  const mutation = useUpdateRemedyManagementEnabled();
-
-  if (!isSuperAdmin) {
-    return (
-      <Badge
-        className={`font-mukta text-xs ${
-          astrologer.isRemedyManagementEnabled
-            ? 'bg-green-50 text-green-700'
-            : 'bg-neutral-100 text-neutral-500'
-        }`}
-      >
-        {astrologer.isRemedyManagementEnabled ? 'Enabled' : 'Disabled'}
-      </Badge>
-    );
-  }
-
-  return (
-    <Switch
-      checked={astrologer.isRemedyManagementEnabled ?? false}
-      disabled={!userId || mutation.isPending}
-      onCheckedChange={checked => {
-        if (!userId) return;
-        mutation.mutate({ astrologerUserId: userId, isRemedyManagementEnabled: checked });
-      }}
-      aria-label="Toggle remedy management access"
-    />
-  );
-}
-
-export default function AstrologersTable({
+export default function RemedyProductsTable({
   data,
   isLoading,
   isFetching,
@@ -157,7 +69,9 @@ export default function AstrologersTable({
   total,
   onPageChange,
   onLimitChange,
-}: AstrologersTableProps) {
+  onEdit,
+  onDelete,
+}: RemedyProductsTableProps) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
@@ -168,13 +82,14 @@ export default function AstrologersTable({
         <TableHeader>
           <TableRow className="border-neutral-100">
             {[
-              'Astrologer',
-              'Tier',
-              'Other Tags',
-              'Experience',
-              'Booking',
-              'Live Streaming',
-              'Manage Remedies',
+              'Image',
+              'Name',
+              'Category',
+              'Price (NPR)',
+              'Stock',
+              'Delivery',
+              'Owner',
+              'Visible',
             ].map(label => (
               <TableHead
                 key={label}
@@ -183,13 +98,16 @@ export default function AstrologersTable({
                 {label}
               </TableHead>
             ))}
+            <TableHead className="font-mukta text-xs uppercase tracking-wide text-neutral-500">
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading &&
             SKELETON_ROW_IDS.slice(0, Math.min(limit, SKELETON_ROW_IDS.length)).map(rowId => (
               <TableRow key={rowId} className="border-neutral-100">
-                {Array.from({ length: COLUMN_COUNT }, (_, i) => (
+                {Array.from({ length: COLUMN_COUNT + 1 }, (_, i) => (
                   <TableCell key={`${rowId}-${i}`}>
                     <Skeleton className="h-4 w-full rounded" />
                   </TableCell>
@@ -198,52 +116,83 @@ export default function AstrologersTable({
             ))}
 
           {!isLoading &&
-            data.map(astrologer => {
-              const otherTags = astrologer.tags ?? [];
+            data.map(remedy => {
+              const defaultImage = remedy.media.find(m => m.isDefault) ?? remedy.media[0];
+              const isAstrologerOwned = remedy.ownerType === 'ASTROLOGER_OWNED';
               return (
-                <TableRow key={astrologer._id} className="border-neutral-100 hover:bg-neutral-50">
+                <TableRow key={remedy.id} className="border-neutral-100 hover:bg-neutral-50">
                   <TableCell>
-                    <div className="font-mukta">
-                      <p className="text-sm text-neutral-800">{astrologer.user?.fullName ?? '—'}</p>
-                      <p className="text-xs text-neutral-400">{astrologer.user?.email ?? '—'}</p>
-                    </div>
+                    {defaultImage ? (
+                      <Image
+                        src={defaultImage.url}
+                        alt={remedy.name}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-lg object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="font-mukta text-sm text-neutral-400">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <TierCell astrologer={astrologer} />
+                    <span className="font-mukta font-medium text-neutral-800">{remedy.name}</span>
                   </TableCell>
                   <TableCell>
                     <span className="font-mukta text-sm text-neutral-600">
-                      {otherTags.length > 0
-                        ? otherTags
-                            .slice(0, 3)
-                            .map(tag => tag.name)
-                            .join(', ') + (otherTags.length > 3 ? '…' : '')
-                        : '—'}
+                      {remedy.category.title}
                     </span>
                   </TableCell>
                   <TableCell>
                     <span className="font-mukta text-sm text-neutral-600">
-                      {typeof astrologer.yearsOfExperience === 'number'
-                        ? `${astrologer.yearsOfExperience} yrs`
-                        : '—'}
+                      {remedy.prices.npr.toLocaleString()}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      className={`font-mukta text-xs ${
-                        astrologer.isBookingEnabled
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-neutral-100 text-neutral-500'
-                      }`}
-                    >
-                      {astrologer.isBookingEnabled ? 'Enabled' : 'Disabled'}
+                    <span className="font-mukta text-sm text-neutral-600">{remedy.stock}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className="bg-neutral-100 font-mukta text-xs text-neutral-600">
+                      {remedy.deliveryType}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <LiveStreamingCell astrologer={astrologer} />
+                    {isAstrologerOwned ? (
+                      <Badge className="bg-amber-50 font-mukta text-xs text-amber-800">
+                        {remedy.astrologer?.astrologerName || 'Astrologer-managed'}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-neutral-100 font-mukta text-xs text-neutral-600">
+                        Astro Sewa
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <RemedyManagementCell astrologer={astrologer} />
+                    <IsActiveCell remedy={remedy} />
+                  </TableCell>
+                  <TableCell>
+                    {isAstrologerOwned ? (
+                      <span className="font-mukta text-xs text-neutral-400">Managed on mobile</span>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-neutral-500 hover:text-[#611508]"
+                          onClick={() => onEdit(remedy)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-neutral-500 hover:text-red-600"
+                          onClick={() => onDelete(remedy)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               );
@@ -252,10 +201,10 @@ export default function AstrologersTable({
           {!isLoading && data.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={COLUMN_COUNT}
+                colSpan={COLUMN_COUNT + 1}
                 className="py-10 text-center font-mukta text-sm text-neutral-400"
               >
-                No astrologers found
+                No remedy products found
               </TableCell>
             </TableRow>
           )}

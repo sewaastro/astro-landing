@@ -20,9 +20,18 @@ export default function CommissionPage() {
       <div className="grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
         <CommissionRateCard
           source="remedy"
-          title="Remedy Commission"
-          description="Applied to astrologer remedy order earnings"
+          title="Remedy Recommendation Commission"
+          description="Paid when an astrologer recommends a Super-Admin-owned remedy via a consultation and the client buys it — a referral reward."
+          fieldLabel="Astrologer's Commission Percentage (%)"
+          notice="Note: this percentage represents the astrologer's share of the remedy price (the opposite of every other commission on this page)."
           settings={data?.remedy}
+          isLoading={isPending}
+        />
+        <CommissionRateCard
+          source="remedy_self_sale"
+          title="Remedy Self-Sale Commission"
+          description="Applied when an astrologer sells a remedy from their own catalog — Astro Sewa's platform fee on their sale."
+          settings={data?.remedySelfSale}
           isLoading={isPending}
         />
         <CommissionRateCard

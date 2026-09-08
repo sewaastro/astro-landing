@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { ghostClient } from '@/lib/ghostClient';
 import { formatViewCount } from '@/lib/blog-utils';
 import { fetchBlogViewCounts, recordBlogView } from '@/lib/blog-view-api';
+import { env } from '@/lib/env';
 import Clarity from '@/components/pages/landing/clarity';
 import TalkToOurAstrologer from '@/components/pages/landing/talk-to-our-astrologer';
 import Services from '@/components/pages/landing/services';
@@ -13,7 +14,7 @@ import DownloadApp from '@/components/pages/landing/download-app';
 
 export const revalidate = 86400;
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.astrosewa.com';
+const BASE_URL = env.siteUrl;
 
 type PostData = {
   id: string;

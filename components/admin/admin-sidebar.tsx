@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Sparkles,
+  Package,
   Truck,
   ShoppingBag,
   Percent,
@@ -12,6 +13,7 @@ import {
   Gift,
   Users,
   Banknote,
+  BarChart3,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -20,6 +22,7 @@ const NAV_ITEMS = [
   // { href: "/admin/tags", icon: Tag, label: "Tags" },
   // { href: "/admin/authors", icon: Users, label: "Authors" },
   { href: '/admin/remedies', icon: Sparkles, label: 'Remedies Category' },
+  { href: '/admin/remedy-products', icon: Package, label: 'Remedy Products' },
   { href: '/admin/remedy-orders', icon: ShoppingBag, label: 'Remedies Orders' },
   { href: '/admin/gifts', icon: Gift, label: 'Gifts' },
   { href: '/admin/delivery-charges', icon: Truck, label: 'Delivery Charges' },
@@ -27,6 +30,7 @@ const NAV_ITEMS = [
   { href: '/admin/astrologer-verification', icon: BadgeCheck, label: 'Astrologer Verification' },
   { href: '/admin/astrologers', icon: Users, label: 'Astrologers' },
   { href: '/admin/payouts', icon: Banknote, label: 'Payouts' },
+  { href: '/admin/remedy-analytics', icon: BarChart3, label: 'Remedy Analytics' },
 ];
 
 export default function AdminSidebar() {
