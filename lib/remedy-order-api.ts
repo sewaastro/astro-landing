@@ -18,6 +18,13 @@ export interface AdminOrderItem {
   imageUrl: string | null;
 }
 
+export interface AdminOrderAstrologer {
+  id: string;
+  name: string;
+  email: string;
+  remedyNames: string[];
+}
+
 export interface AdminRemedyOrder {
   id: string;
   trackingNumber: string;
@@ -32,8 +39,12 @@ export interface AdminRemedyOrder {
   userName: string;
   userEmail: string;
   userPhone: string | null;
-  astrologerName: string;
-  astrologerEmail: string;
+  astrologers: AdminOrderAstrologer[];
+  shippingAddress: string | null;
+  accessVia: string | null;
+  onsiteAddress: string | null;
+  onsiteDate: string | null;
+  onsiteTime: string | null;
 }
 
 export interface AdminPaginatedOrders {
