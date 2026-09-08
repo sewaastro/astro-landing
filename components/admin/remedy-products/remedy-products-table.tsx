@@ -1,7 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { Pencil, Trash2, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
+import {
+  Pencil,
+  Trash2,
+  ChevronsLeft,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRight,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -74,16 +81,23 @@ export default function RemedyProductsTable({
       <Table>
         <TableHeader>
           <TableRow className="border-neutral-100">
-            {['Image', 'Name', 'Category', 'Price (NPR)', 'Stock', 'Delivery', 'Owner', 'Visible'].map(
-              label => (
-                <TableHead
-                  key={label}
-                  className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
-                >
-                  {label}
-                </TableHead>
-              ),
-            )}
+            {[
+              'Image',
+              'Name',
+              'Category',
+              'Price (NPR)',
+              'Stock',
+              'Delivery',
+              'Owner',
+              'Visible',
+            ].map(label => (
+              <TableHead
+                key={label}
+                className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
+              >
+                {label}
+              </TableHead>
+            ))}
             <TableHead className="font-mukta text-xs uppercase tracking-wide text-neutral-500">
               Actions
             </TableHead>
@@ -158,9 +172,7 @@ export default function RemedyProductsTable({
                   </TableCell>
                   <TableCell>
                     {isAstrologerOwned ? (
-                      <span className="font-mukta text-xs text-neutral-400">
-                        Managed on mobile
-                      </span>
+                      <span className="font-mukta text-xs text-neutral-400">Managed on mobile</span>
                     ) : (
                       <div className="flex items-center gap-1">
                         <Button

@@ -66,16 +66,14 @@ export default function RecentPayoutsTable({
       <Table>
         <TableHeader>
           <TableRow className="border-neutral-100">
-            {['Astrologer', 'Payout Reference', 'Earnings Paid', 'Amount', 'Paid On'].map(
-              label => (
-                <TableHead
-                  key={label}
-                  className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
-                >
-                  {label}
-                </TableHead>
-              ),
-            )}
+            {['Astrologer', 'Payout Reference', 'Earnings Paid', 'Amount', 'Paid On'].map(label => (
+              <TableHead
+                key={label}
+                className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
+              >
+                {label}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -103,9 +101,7 @@ export default function RecentPayoutsTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mukta text-sm text-neutral-600">
-                    {row.payoutReference}
-                  </span>
+                  <span className="font-mukta text-sm text-neutral-600">{row.payoutReference}</span>
                 </TableCell>
                 <TableCell>
                   <span className="font-mukta text-sm text-neutral-600">{row.count}</span>

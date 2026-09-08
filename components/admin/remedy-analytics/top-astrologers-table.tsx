@@ -53,9 +53,7 @@ export function TopAstrologersTable({ data, isLoading }: TopAstrologersTableProp
                 </span>
               </TableCell>
               <TableCell>
-                <span className="font-mukta text-sm text-neutral-600">
-                  {row.ordersAttributed}
-                </span>
+                <span className="font-mukta text-sm text-neutral-600">{row.ordersAttributed}</span>
               </TableCell>
               <TableCell>
                 <span className="font-mukta text-sm text-neutral-600">

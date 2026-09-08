@@ -23,10 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRemediesCategories } from '@/hooks/use-remedies-category';
-import {
-  useDeleteRemedyMedia,
-  useUploadRemedyMedia,
-} from '@/hooks/use-remedy-products';
+import { useDeleteRemedyMedia, useUploadRemedyMedia } from '@/hooks/use-remedy-products';
 import { MediaUploader, type UploaderMediaItem } from './media-uploader';
 import type { DeliveryType } from '@/lib/remedy-order-api';
 import type { RemedyProduct, RemedyProductInput } from '@/lib/remedy-product-api';
@@ -155,7 +152,11 @@ export function RemedyProductForm({
             <FormItem>
               <FormLabel className="font-mukta text-neutral-700">Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="e.g. 5 Mukhi Rudraksha Mala" className="font-mukta" />
+                <Input
+                  {...field}
+                  placeholder="e.g. 5 Mukhi Rudraksha Mala"
+                  className="font-mukta"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -341,9 +342,7 @@ export function RemedyProductForm({
           name="isActive"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-md border border-neutral-200 px-3 py-2.5">
-              <FormLabel className="font-mukta text-neutral-700">
-                Visible to users
-              </FormLabel>
+              <FormLabel className="font-mukta text-neutral-700">Visible to users</FormLabel>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>

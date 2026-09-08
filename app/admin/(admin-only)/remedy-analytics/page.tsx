@@ -27,7 +27,9 @@ function rangeToFrom(range: RangeValue): string | undefined {
   if (range === 'all') return undefined;
   const now = new Date();
   if (range === 'today') {
-    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+    return new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    ).toISOString();
   }
   const days = range === '7d' ? 7 : 30;
   const from = new Date(now);

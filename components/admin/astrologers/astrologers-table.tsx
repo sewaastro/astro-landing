@@ -175,16 +175,14 @@ export default function AstrologersTable({
               'Booking',
               'Live Streaming',
               'Manage Remedies',
-            ].map(
-              label => (
-                <TableHead
-                  key={label}
-                  className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
-                >
-                  {label}
-                </TableHead>
-              ),
-            )}
+            ].map(label => (
+              <TableHead
+                key={label}
+                className="font-mukta text-xs uppercase tracking-wide text-neutral-500"
+              >
+                {label}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>

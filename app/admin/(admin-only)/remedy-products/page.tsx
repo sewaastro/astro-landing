@@ -45,8 +45,8 @@ export default function RemedyProductsPage() {
         <div>
           <h1 className="font-mukta text-2xl font-semibold text-neutral-800">Remedy Products</h1>
           <p className="mt-0.5 font-mukta text-sm text-neutral-500">
-            Manage the remedy catalog available to users. Astrologer-managed remedies stay
-            editable only from the mobile app.
+            Manage the remedy catalog available to users. Astrologer-managed remedies stay editable
+            only from the mobile app.
           </p>
         </div>
         <Button

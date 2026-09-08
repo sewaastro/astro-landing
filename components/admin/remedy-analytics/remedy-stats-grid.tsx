@@ -16,7 +16,12 @@ interface RemedyStatsGridProps {
 
 export function RemedyStatsGrid({ data, isLoading }: RemedyStatsGridProps) {
   const stats = [
-    { label: 'Total Remedies Sold', value: data?.totalOrders, icon: ShoppingBag, isCurrency: false },
+    {
+      label: 'Total Remedies Sold',
+      value: data?.totalOrders,
+      icon: ShoppingBag,
+      isCurrency: false,
+    },
     { label: 'Total Revenue', value: data?.totalRevenueGross, icon: TrendingUp, isCurrency: true },
     {
       label: 'Astrologer Commission Paid',
