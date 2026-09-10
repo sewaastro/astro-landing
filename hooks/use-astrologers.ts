@@ -6,7 +6,33 @@ import {
   fetchAdminAstrologers,
   updateLiveStreamingEnabled,
   updateRemedyManagementEnabled,
+  type AdminAstrologerList,
 } from '@/lib/astrologers-admin-api';
+
+function optimisticallyPatchAstrologer(
+  queryClient: ReturnType<typeof useQueryClient>,
+  astrologerUserId: string,
+  patch: Partial<AdminAstrologerList['items'][number]>,
+) {
+  const previous = queryClient.getQueriesData<AdminAstrologerList>({ queryKey: ['astrologers'] });
+  queryClient.setQueriesData<AdminAstrologerList>({ queryKey: ['astrologers'] }, old => {
+    if (!old) return old;
+    return {
+      ...old,
+      items: old.items.map(astrologer =>
+        astrologer.user?._id === astrologerUserId ? { ...astrologer, ...patch } : astrologer,
+      ),
+    };
+  });
+  return previous;
+}
+
+function rollbackAstrologers(
+  queryClient: ReturnType<typeof useQueryClient>,
+  previous: [readonly unknown[], AdminAstrologerList | undefined][] | undefined,
+) {
+  previous?.forEach(([queryKey, data]) => queryClient.setQueryData(queryKey, data));
+}
 
 function useBackendToken(): string | null {
   const { data: session, status } = useSession();
@@ -36,7 +62,15 @@ export function useUpdateLiveStreamingEnabled() {
       astrologerUserId: string;
       isLiveStreamingEnabled: boolean;
     }) => updateLiveStreamingEnabled(token!, astrologerUserId, isLiveStreamingEnabled),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
+    onMutate: async ({ astrologerUserId, isLiveStreamingEnabled }) => {
+      await queryClient.cancelQueries({ queryKey: ['astrologers'] });
+      const previous = optimisticallyPatchAstrologer(queryClient, astrologerUserId, {
+        isLiveStreamingEnabled,
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => rollbackAstrologers(queryClient, context?.previous),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
   });
 }
 
@@ -51,6 +85,14 @@ export function useUpdateRemedyManagementEnabled() {
       astrologerUserId: string;
       isRemedyManagementEnabled: boolean;
     }) => updateRemedyManagementEnabled(token!, astrologerUserId, isRemedyManagementEnabled),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
+    onMutate: async ({ astrologerUserId, isRemedyManagementEnabled }) => {
+      await queryClient.cancelQueries({ queryKey: ['astrologers'] });
+      const previous = optimisticallyPatchAstrologer(queryClient, astrologerUserId, {
+        isRemedyManagementEnabled,
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => rollbackAstrologers(queryClient, context?.previous),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['astrologers'] }),
   });
 }
