@@ -33,7 +33,11 @@ import type { RemedyProduct } from '@/lib/remedy-product-api';
 
 const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SKELETON_ROW_IDS = ['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5'];
-const COLUMN_COUNT = 8;
+const COLUMN_COUNT = 11;
+
+function currentAmount(price: number, discount: number) {
+  return discount > 0 ? Number((price * (1 - discount / 100)).toFixed(2)) : price;
+}
 
 interface RemedyProductsTableProps {
   data: RemedyProduct[];
@@ -85,7 +89,10 @@ export default function RemedyProductsTable({
               'Image',
               'Name',
               'Category',
+              'Subcategory',
               'Price (NPR)',
+              'Price (INR)',
+              'Price (USD)',
               'Stock',
               'Delivery',
               'Owner',
@@ -145,7 +152,22 @@ export default function RemedyProductsTable({
                   </TableCell>
                   <TableCell>
                     <span className="font-mukta text-sm text-neutral-600">
-                      {remedy.prices.npr.toLocaleString()}
+                      {remedy.subcategory.length > 0 ? remedy.subcategory.join(', ') : '—'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mukta text-sm text-neutral-600">
+                      {currentAmount(remedy.prices.npr, remedy.discount).toLocaleString()}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mukta text-sm text-neutral-600">
+                      {currentAmount(remedy.prices.inr, remedy.discount).toLocaleString()}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mukta text-sm text-neutral-600">
+                      {currentAmount(remedy.prices.usd, remedy.discount).toLocaleString()}
                     </span>
                   </TableCell>
                   <TableCell>
